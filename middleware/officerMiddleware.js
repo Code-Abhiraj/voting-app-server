@@ -5,20 +5,26 @@ const OfficerMiddleware = (req, res, next) => {
         const token = req.headers.token;
         if(!token) {
             return res.status(406).json({
-                'message': 'Token not found'
+                message: 'Token not found'
             });
         }
         const decoded = jwt.verify(token, process.env.OFFICER_SECRET);
         if(!decoded) {
             return res.status(407).json({
-                'message': 'Invalid Token'
+                message: 'Invalid Token'
+            });
+        }
+        if(decoded.role != 'officer')
+        {
+            return res.status(406).json({
+                message: 'Only officers are allowed'
             });
         }
         req.officerId = decoded.id;
         next();
     } catch(err) {
         return res.status(500).json({
-            'message' : err
+            message : err
         });
     }
 }
